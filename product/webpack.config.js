@@ -36,18 +36,14 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.BannerPlugin("版权所有，翻版必究"),
+    new webpack.BannerPlugin("Bǎnquán suǒyǒu"),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "/src/index.html"),
       filename: "./index.html",
       minify: {
-        // 移除空属性
         removeEmptyAttributes: true,
-        // 压缩css
         minifyCSS: true,
-        // 压缩JS
         minifyJS: true,
-        // 移除空格
         collapseWhitespace: true
       },
       hash: true,

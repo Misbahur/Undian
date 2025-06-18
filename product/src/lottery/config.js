@@ -136,7 +136,6 @@ const NUMBER_MATRIX = [
     [2, 4]
   ]
 ];
-
 module.exports = {
   NUMBER_MATRIX
 };

@@ -10,11 +10,9 @@ window.AJAX = function (opt) {
     } else if (window.ActiveXObject) { // IE 6 and older
         xhr = new ActiveXObject("Microsoft.XMLHTTP");
     }
-
     if (opt.isJson) {
         data = JSON.stringify(opt.data);
     }
-
     xhr.onreadystatechange = function () {
         // try {
         if (xhr.readyState === 4) {
