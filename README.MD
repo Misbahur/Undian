@@ -6,8 +6,7 @@ Web Page: Three.js, References to the official 3D example of `Three.js`
 
 ## Install
 ```
-git clone https://github.com/moshang-xc/lottery.git
-
+git clone https://github.com/Misbahur/Undian.git
 cd lottery
 
 # Server plugin installation
