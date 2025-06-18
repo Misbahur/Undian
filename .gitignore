@@ -3,4 +3,4 @@ node_modules/
 dist/
 temp.json
 error.json
-list.xlsx
+server/data/list.xlsx
