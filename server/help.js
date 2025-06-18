@@ -8,7 +8,7 @@ if (!fs.existsSync(cwd)) {
 }
 
 /**
- * 读取缓存的数据内容
+ * Membaca data cache
  */
 function loadTempData() {
   let pros = [];
@@ -40,7 +40,7 @@ function loadTempData() {
 }
 
 /**
- * 读取XML文件数据
+ * Membaca data file XML
  */
 function loadXML(xmlPath) {
   let userData = xlsx.parse(xmlPath);
@@ -55,14 +55,14 @@ function loadXML(xmlPath) {
 }
 
 /**
- * 写入excel
+ * Menulis data ke Excel
  * @param {Array} data
  * @param {string} name
  */
 function writeXML(data, name) {
   let buffer = xlsx.build([
     {
-      name: "抽奖结果",
+      name: "Hasil Undian",
       data: data
     }
   ]);
@@ -79,7 +79,7 @@ function writeXML(data, name) {
 }
 
 /**
- * 写入文件
+ * Menyimpan data ke file
  * @param {*} data
  */
 function saveDataFile(data) {
@@ -96,13 +96,13 @@ function saveDataFile(data) {
         return;
       }
       resolve();
-      console.log("数据写入成功");
+      console.log("Data berhasil disimpan");
     });
   });
 }
 
 /**
- * 错误日志文件输出
+ * Menyimpan log error ke file
  * @param {*} data
  */
 function saveErrorDataFile(data) {
@@ -118,13 +118,13 @@ function saveErrorDataFile(data) {
         return;
       }
       resolve();
-      console.log("数据写入成功");
+      console.log("Data berhasil disimpan");
     });
   });
 }
 
 /**
- * 洗牌算法
+ * Algoritma pengacakan (shuffle)
  * @param {*} arr
  */
 function shuffle(arr) {

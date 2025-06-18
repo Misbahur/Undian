@@ -1,12 +1,12 @@
 (function () {
-  //based on an Example by @curran
+  //berdasarkan Contoh oleh @curran
   window.requestAnimFrame = (function () {
     return window.requestAnimationFrame;
   })();
   var canvas = document.getElementById("canvas");
 
   ~~(function setSize() {
-    //定义canvas的宽高，让他跟浏览器的窗口的宽高相同
+    //menentukan lebar dan tinggi canvas agar sesuai dengan jendela browser
     window.onresize = arguments.callee;
     w = window.innerWidth;
     h = window.innerHeight;
@@ -66,7 +66,7 @@
   function drawStars() {
     var pixelX, pixelY, pixelRadius;
 
-    // Resize to the screen
+    // Sesuaikan ukuran dengan layar
     if (
       canvas.width != window.innerWidth ||
       canvas.width != window.innerWidth

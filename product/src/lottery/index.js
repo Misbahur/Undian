@@ -26,7 +26,7 @@ let TOTAL_CARDS,
   COLUMN_COUNT = 17,
   COMPANY,
   HIGHLIGHT_CELL = [],
-  // 当前的比例
+  // Rasio resolusi saat ini
   Resolution = 1;
 
 let camera,
@@ -44,29 +44,29 @@ let rotateObj;
 let selectedCardIndex = [],
   rotate = false,
   basicData = {
-    prizes: [], //奖品信息
-    users: [], //所有人员
-    luckyUsers: {}, //已中奖人员
-    leftUsers: [] //未中奖人员
+    prizes: [], //Informasi hadiah
+    users: [], //Semua peserta
+    luckyUsers: {}, //Peserta yang sudah menang
+    leftUsers: [] //Peserta yang belum menang
   },
   interval,
-  // 当前抽的奖项，从最低奖开始抽，直到抽到大奖
+  // Hadiah yang sedang diundi, mulai dari hadiah terkecil sampai hadiah utama
   currentPrizeIndex,
   currentPrize,
-  // 正在抽奖
+  // Sedang mengundi
   isLotting = false,
   currentLuckys = [];
 
 initAll();
 
 /**
- * 初始化所有DOM
+ * Inisialisasi semua DOM
  */
 function initAll() {
   window.AJAX({
     url: "/getTempData",
     success(data) {
-      // 获取基础数据
+      // Mendapatkan data dasar
       prizes = data.cfgData.prizes;
       EACH_COUNT = data.cfgData.EACH_COUNT;
       COMPANY = data.cfgData.COMPANY;
@@ -76,7 +76,7 @@ function initAll() {
 
       TOTAL_CARDS = ROW_COUNT * COLUMN_COUNT;
 
-      // 读取当前已设置的抽奖结果
+      // Membaca hasil undian yang sudah disetel
       basicData.leftUsers = data.leftUsers;
       basicData.luckyUsers = data.luckyData;
 
@@ -203,49 +203,49 @@ function setLotteryStatus(status = false) {
 }
 
 /**
- * 事件绑定
+ * Event binding
  */
 function bindEvent() {
   document.querySelector("#menu").addEventListener("click", function (e) {
     e.stopPropagation();
-    // 如果正在抽奖，则禁止一切操作
+    // Jika sedang mengundi, larang semua operasi
     if (isLotting) {
       if (e.target.id === "lottery") {
         rotateObj.stop();
-        btns.lottery.innerHTML = "开始抽奖";
+        btns.lottery.innerHTML = "Mulai Undian";
       } else {
-        addQipao("正在抽奖，抽慢一点点～～");
+        addQipao("Sedang mengundi, harap tunggu sebentar~~");
       }
       return false;
     }
 
     let target = e.target.id;
     switch (target) {
-      // 显示数字墙
+      // Tampilkan dinding angka
       case "welcome":
         switchScreen("enter");
         rotate = false;
         break;
-      // 进入抽奖
+      // Masuk ke undian
       case "enter":
         removeHighlight();
-        addQipao(`马上抽取[${currentPrize.title}],不要走开。`);
+        addQipao(`Akan segera mengundi [${currentPrize.title}], jangan pergi.`);
         // rotate = !rotate;
         rotate = true;
         switchScreen("lottery");
         break;
-      // 重置
+      // Reset
       case "reset":
         let doREset = window.confirm(
-          "是否确认重置数据，重置后，当前已抽的奖项全部清空？"
+          "Apakah Anda yakin ingin mereset data? Setelah reset, semua hadiah yang sudah diundi akan dikosongkan?"
         );
         if (!doREset) {
           return;
         }
-        addQipao("重置所有数据，重新抽奖");
+        addQipao("Mereset semua data, memulai undian kembali");
         addHighlight();
         resetCard();
-        // 重置所有数据
+        // Reset semua data
         currentLuckys = [];
         basicData.leftUsers = Object.assign([], basicData.users);
         basicData.luckyUsers = {};
@@ -256,44 +256,44 @@ function bindEvent() {
         reset();
         switchScreen("enter");
         break;
-      // 抽奖
+      // Undian
       case "lottery":
         setLotteryStatus(true);
-        // 每次抽奖前先保存上一次的抽奖数据
+        // Simpan data undian sebelumnya sebelum mengundi
         saveData();
-        //更新剩余抽奖数目的数据显示
+        //Perbarui tampilan jumlah undian yang tersisa
         changePrize();
         resetCard().then(res => {
-          // 抽奖
+          // Mengundi
           lottery();
         });
-        addQipao(`正在抽取[${currentPrize.title}],调整好姿势`);
+        addQipao(`Sedang mengundi [${currentPrize.title}], bersiap-siap`);
         break;
-      // 重新抽奖
+      // Undi ulang
       case "reLottery":
         if (currentLuckys.length === 0) {
-          addQipao(`当前还没有抽奖，无法重新抽取喔~~`);
+          addQipao(`Belum ada undian, tidak bisa mengundi ulang~~`);
           return;
         }
         setErrorData(currentLuckys);
-        addQipao(`重新抽取[${currentPrize.title}],做好准备`);
+        addQipao(`Mengundi ulang [${currentPrize.title}], bersiap-siap`);
         setLotteryStatus(true);
-        // 重新抽奖则直接进行抽取，不对上一次的抽奖数据进行保存
-        // 抽奖
+        // Langsung mengundi tanpa menyimpan data undian sebelumnya
+        // Mengundi
         resetCard().then(res => {
-          // 抽奖
+          // Mengundi
           lottery();
         });
         break;
-      // 导出抽奖结果
+      // Ekspor hasil undian
       case "save":
         saveData().then(res => {
           resetCard().then(res => {
-            // 将之前的记录置空
+            // Kosongkan catatan sebelumnya
             currentLuckys = [];
           });
           exportData();
-          addQipao(`数据已保存到EXCEL中。`);
+          addQipao(`Data telah disimpan ke dalam EXCEL.`);
         });
         break;
     }
@@ -318,7 +318,7 @@ function switchScreen(type) {
 }
 
 /**
- * 创建元素
+ * Membuat elemen
  */
 function createElement(css, text) {
   let dom = document.createElement("div");
@@ -328,7 +328,7 @@ function createElement(css, text) {
 }
 
 /**
- * 创建名牌
+ * Membuat kartu nama
  */
 function createCard(user, isBold, id, showTable) {
   var element = createElement();
@@ -344,7 +344,7 @@ function createCard(user, isBold, id, showTable) {
     element.style.backgroundColor =
       "rgba(0,127,127," + (Math.random() * 0.7 + 0.25) + ")";
   }
-  //添加公司标识
+  //Tambahkan logo perusahaan
   element.appendChild(createElement("company", COMPANY));
 
   element.appendChild(createElement("name", user[1]));
@@ -366,7 +366,7 @@ function addHighlight() {
 }
 
 /**
- * 渲染地球等
+ * Render globe dll
  */
 function transform(targets, duration) {
   // TWEEN.removeAll();
@@ -405,25 +405,6 @@ function transform(targets, duration) {
     .start();
 }
 
-// function rotateBall() {
-//   return new Promise((resolve, reject) => {
-//     scene.rotation.y = 0;
-//     new TWEEN.Tween(scene.rotation)
-//       .to(
-//         {
-//           y: Math.PI * 8
-//         },
-//         ROTATE_TIME
-//       )
-//       .onUpdate(render)
-//       .easing(TWEEN.Easing.Exponential.InOut)
-//       .start()
-//       .onComplete(() => {
-//         resolve();
-//       });
-//   });
-// }
-
 function rotateBall() {
   return new Promise((resolve, reject) => {
     scene.rotation.y = 0;
@@ -456,15 +437,9 @@ function onWindowResize() {
 }
 
 function animate() {
-  // 让场景通过x轴或者y轴旋转
-  // rotate && (scene.rotation.y += 0.088);
-
   requestAnimationFrame(animate);
   TWEEN.update();
   controls.update();
-
-  // 渲染循环
-  // render();
 }
 
 function render() {
@@ -477,7 +452,7 @@ function selectCard(duration = 600) {
     tag = -(currentLuckys.length - 1) / 2,
     locates = [];
 
-  // 计算位置信息, 大于5个分两排显示
+  // Hitung informasi posisi, jika lebih dari 5 tampilkan dalam dua baris
   if (currentLuckys.length > 5) {
     let yPosition = [-87, 87],
       l = selectedCardIndex.length,
@@ -511,7 +486,7 @@ function selectCard(duration = 600) {
 
   let text = currentLuckys.map(item => item[1]);
   addQipao(
-    `恭喜${text.join("、")}获得${currentPrize.title}, 新的一年必定旺旺旺。`
+    `Selamat kepada ${text.join(", ")} memenangkan ${currentPrize.title}, SEmarak HAdiah pelanggan.`
   );
 
   selectedCardIndex.forEach((cardIndex, index) => {
@@ -550,13 +525,13 @@ function selectCard(duration = 600) {
     .onUpdate(render)
     .start()
     .onComplete(() => {
-      // 动画结束后可以操作
+      // Bisa dioperasikan setelah animasi selesai
       setLotteryStatus();
     });
 }
 
 /**
- * 重置抽奖牌内容
+ * Reset konten kartu undian
  */
 function resetCard(duration = 500) {
   if (currentLuckys.length === 0) {
@@ -608,27 +583,22 @@ function resetCard(duration = 500) {
 }
 
 /**
- * 抽奖
+ * Mengundi
  */
 function lottery() {
-  // if (isLotting) {
-  //   rotateObj.stop();
-  //   btns.lottery.innerHTML = "开始抽奖";
-  //   return;
-  // }
-  btns.lottery.innerHTML = "结束抽奖";
+  btns.lottery.innerHTML = "Hentikan Undian";
   rotateBall().then(() => {
-    // 将之前的记录置空
+    // Kosongkan catatan sebelumnya
     currentLuckys = [];
     selectedCardIndex = [];
-    // 当前同时抽取的数目,当前奖品抽完还可以继续抽，但是不记录数据
+    // Jumlah undian saat ini, hadiah saat ini bisa terus diundi meskipun sudah habis, tetapi data tidak dicatat
     let perCount = EACH_COUNT[currentPrizeIndex],
       luckyData = basicData.luckyUsers[currentPrize.type],
       leftCount = basicData.leftUsers.length,
       leftPrizeCount = currentPrize.count - (luckyData ? luckyData.length : 0);
 
     if (leftCount < perCount) {
-      addQipao("剩余参与抽奖人员不足，现在重新设置所有人员可以进行二次抽奖！");
+      addQipao("Peserta undian yang tersisa tidak cukup, sekarang mengatur ulang semua peserta untuk bisa mengundi lagi!");
       basicData.leftUsers = basicData.users.slice();
       leftCount = basicData.leftUsers.length;
     }
@@ -650,17 +620,16 @@ function lottery() {
       }
     }
 
-    // console.log(currentLuckys);
     selectCard();
   });
 }
 
 /**
- * 保存上一次的抽奖结果
+ * Menyimpan hasil undian sebelumnya
  */
 function saveData() {
   if (!currentPrize) {
-    //若奖品抽完，则不再记录数据，但是还是可以进行抽奖
+    //Jika hadiah sudah habis, tidak mencatat data lagi, tetapi masih bisa mengundi
     return;
   }
 
@@ -680,7 +649,7 @@ function saveData() {
   }
 
   if (currentLuckys.length > 0) {
-    // todo by xc 添加数据保存机制，以免服务器挂掉数据丢失
+    // todo by xc Tambahkan mekanisme penyimpanan data agar data tidak hilang jika server mati
     return setData(type, currentLuckys);
   }
   return Promise.resolve();
@@ -689,20 +658,19 @@ function saveData() {
 function changePrize() {
   let luckys = basicData.luckyUsers[currentPrize.type];
   let luckyCount = (luckys ? luckys.length : 0) + EACH_COUNT[currentPrizeIndex];
-  // 修改左侧prize的数目和百分比
+  // Ubah jumlah dan persentase prize di sebelah kiri
   setPrizeData(currentPrizeIndex, luckyCount);
 }
 
 /**
- * 随机抽奖
+ * Undian acak
  */
 function random(num) {
-  // Math.floor取到0-num-1之间数字的概率是相等的
   return Math.floor(Math.random() * num);
 }
 
 /**
- * 切换名牌人员信息
+ * Mengganti informasi peserta di kartu nama
  */
 function changeCard(cardIndex, user) {
   let card = threeDCards[cardIndex].element;
@@ -713,7 +681,7 @@ function changeCard(cardIndex, user) {
 }
 
 /**
- * 切换名牌背景
+ * Mengganti latar belakang kartu nama
  */
 function shine(cardIndex, color) {
   let card = threeDCards[cardIndex].element;
@@ -722,7 +690,7 @@ function shine(cardIndex, color) {
 }
 
 /**
- * 随机切换背景和人员信息
+ * Mengganti latar belakang dan informasi peserta secara acak
  */
 function shineCard() {
   let maxCard = 10,
@@ -730,7 +698,7 @@ function shineCard() {
   let shineCard = 10 + random(maxCard);
 
   setInterval(() => {
-    // 正在抽奖停止闪烁
+    // Berhenti berkedip jika sedang mengundi
     if (isLotting) {
       return;
     }
@@ -738,7 +706,7 @@ function shineCard() {
     for (let i = 0; i < shineCard; i++) {
       let index = random(maxUser),
         cardIndex = random(TOTAL_CARDS);
-      // 当前显示的已抽中名单不进行随机切换
+      // Daftar pemenang yang sedang ditampilkan tidak diganti secara acak
       if (selectedCardIndex.includes(cardIndex)) {
         continue;
       }
@@ -798,7 +766,7 @@ function reset() {
   window.AJAX({
     url: "/reset",
     success(data) {
-      console.log("重置成功");
+      console.log("Reset berhasil");
     }
   });
 }
@@ -855,7 +823,7 @@ window.onload = function () {
             animate();
           },
           () => {
-            addQipao("背景音乐自动播放失败，请手动播放！");
+            addQipao("Musik latar gagal diputar otomatis, harap putar manual!");
           }
         );
       } else {

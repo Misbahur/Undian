@@ -5,17 +5,17 @@ let defaultType = 0;
 
 let prizes;
 const DEFAULT_MESS = [
-  "我是该抽中一等奖还是一等奖呢，纠结ing...",
-  "听说要提前一个月吃素才能中大奖喔！",
-  "好想要一等奖啊！！！",
-  "一等奖有没有人想要呢？",
-  "五等奖也不错，只要自己能中奖就行",
-  "祝大家新年快乐！",
-  "中不中奖不重要，大家吃好喝好。",
-  "新年，祝福大家事事顺遂。",
-  "作为专业陪跑的我，我就看看你们有谁跟我一样",
-  "新的一年祝福大家越来越好！",
-  "来年再战！！！"
+  "Haruskah aku memilih hadiah pertama atau hadiah pertama? Bingung...",
+  "Katanya harus puasa makan sayur sebulan sebelumnya untuk menang hadiah utama!",
+  "Aku sangat ingin hadiah pertama!!!",
+  "Ada yang mau hadiah pertama nggak?",
+  "Hadiah kelima juga lumayan, yang penting menang",
+  "Selamat Tahun Baru semuanya!",
+  "Menang atau tidak penting, yang penting kita makan minum dengan gembira.",
+  "Tahun baru, semoga semua berjalan lancar.",
+  "Sebagai peserta profesional, aku hanya ingin lihat siapa yang sama sepertiku",
+  "Tahun baru, semoga kita semua semakin sukses!",
+  "Kita bertarung lagi tahun depan!!!"
 ];
 
 let lastDanMuList = [];
@@ -156,9 +156,9 @@ function setPrizes(pri) {
 function showPrizeList(currentPrizeIndex) {
   let currentPrize = prizes[currentPrizeIndex];
   if (currentPrize.type === defaultType) {
-    currentPrize.count === "不限制";
+    currentPrize.count === "tidak terbatas";
   }
-  let htmlCode = `<div class="prize-mess">正在抽取<label id="prizeType" class="prize-shine">${currentPrize.text}</label><label id="prizeText" class="prize-shine">${currentPrize.title}</label>，剩余<label id="prizeLeft" class="prize-shine">${currentPrize.count}</label>个</div><ul class="prize-list">`;
+  let htmlCode = `<div class="prize-mess">Sedang mengundi <label id="prizeType" class="prize-shine">${currentPrize.text}</label><label id="prizeText" class="prize-shine">${currentPrize.title}</label>, tersisa <label id="prizeLeft" class="prize-shine">${currentPrize.count}</label></div><ul class="prize-list">`;
   prizes.forEach(item => {
     if (item.type === defaultType) {
       return true;
@@ -247,9 +247,9 @@ let setPrizeData = (function () {
     }
 
     if (currentPrizeIndex === 0) {
-      prizeElement.prizeType.textContent = "特别奖";
+      prizeElement.prizeType.textContent = "Hadiah spesial";
       prizeElement.prizeText.textContent = " ";
-      prizeElement.prizeLeft.textContent = "不限制";
+      prizeElement.prizeLeft.textContent = "tidak terbatas";
       return;
     }
 
