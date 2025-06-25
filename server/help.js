@@ -46,11 +46,19 @@ function loadXML(xmlPath) {
   let userData = xlsx.parse(xmlPath);
   let outData = [];
   userData.forEach(item => {
-    outData = item.data;
-    outData.shift();
+    let rows = item.data;
+    const header = rows.shift();
+    rows.forEach(row => {
+      // Buat object {msisdn:..., region:..., dst}
+      let obj = {};
+      header.forEach((col, idx) => {
+        obj[col.trim().toLowerCase()] = (row[idx] !== undefined ? row[idx] : '').toString().trim();
+      });
+      // Filter baris kosong (jika msisdn kosong)
+      if (obj.msisdn) outData.push(obj);
+    });
     return false;
   });
-  outData = outData.filter(item => item.length > 0);
   return outData;
 }
 

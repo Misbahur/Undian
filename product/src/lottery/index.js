@@ -58,7 +58,7 @@ let selectedCardIndex = [],
   currentLuckys = [];
 
 initAll();
-
+// console.log("DEBUG CARD:", user);
 /**
  * Inisialisasi semua DOM
  */
@@ -77,15 +77,14 @@ function initAll() {
       TOTAL_CARDS = ROW_COUNT * COLUMN_COUNT;
 
       // Membaca hasil undian yang sudah disetel
-      basicData.leftUsers = data.leftUsers;
-      basicData.luckyUsers = data.luckyData;
+      basicData.leftUsers = data.leftUsers || [];
+      basicData.luckyUsers = data.luckyData || {};
 
       let prizeIndex = basicData.prizes.length - 1;
       for (; prizeIndex > -1; prizeIndex--) {
         if (
           data.luckyData[prizeIndex] &&
-          data.luckyData[prizeIndex].length >=
-            basicData.prizes[prizeIndex].count
+          data.luckyData[prizeIndex].length >= basicData.prizes[prizeIndex].count
         ) {
           continue;
         }
@@ -104,9 +103,13 @@ function initAll() {
     url: "/getUsers",
     success(data) {
       basicData.users = data;
+      // FIX: Selalu update leftUsers juga!
+      basicData.leftUsers = data.slice();
+      // DEBUG: cek isi peserta
+      console.log("Peserta users:", basicData.users.length, basicData.users.slice(0, 3));
+      console.log("Peserta leftUsers:", basicData.leftUsers.length, basicData.leftUsers.slice(0, 3));
 
       initCards();
-      // startMaoPao();
       animate();
       shineCard();
     }
@@ -347,9 +350,9 @@ function createCard(user, isBold, id, showTable) {
   //Tambahkan logo perusahaan
   element.appendChild(createElement("company", COMPANY));
 
-  element.appendChild(createElement("name", user[1]));
+  element.appendChild(createElement("name", user.msisdn || "-"));
 
-  element.appendChild(createElement("details", user[0] + "<br/>" + user[2]));
+  element.appendChild(createElement("details", user.region + "<br/>" + user.city));
   return element;
 }
 
@@ -588,38 +591,93 @@ function resetCard(duration = 500) {
 function lottery() {
   btns.lottery.innerHTML = "Hentikan Undian";
   rotateBall().then(() => {
-    // Kosongkan catatan sebelumnya
     currentLuckys = [];
     selectedCardIndex = [];
-    // Jumlah undian saat ini, hadiah saat ini bisa terus diundi meskipun sudah habis, tetapi data tidak dicatat
-    let perCount = EACH_COUNT[currentPrizeIndex],
-      luckyData = basicData.luckyUsers[currentPrize.type],
-      leftCount = basicData.leftUsers.length,
-      leftPrizeCount = currentPrize.count - (luckyData ? luckyData.length : 0);
+    const luckyData = basicData.luckyUsers[currentPrize.type] || [];
+    let leftPrizeCount = currentPrize.count - luckyData.length;
 
-    if (leftCount < perCount) {
-      addQipao("Peserta undian yang tersisa tidak cukup, sekarang mengatur ulang semua peserta untuk bisa mengundi lagi!");
-      basicData.leftUsers = basicData.users.slice();
-      leftCount = basicData.leftUsers.length;
-    }
+    const batch = EACH_COUNT[currentPrizeIndex]; // jumlah undian per klik
 
-    for (let i = 0; i < perCount; i++) {
-      let luckyId = random(leftCount);
-      currentLuckys.push(basicData.leftUsers.splice(luckyId, 1)[0]);
-      leftCount--;
-      leftPrizeCount--;
+    if (currentPrize.regionQuota) {
+      // Siapkan region yang masih ada quota-nya
+      let regionList = Object.entries(currentPrize.regionQuota)
+        .map(([region, quota]) => {
+          let sudahMenang = luckyData.filter(u => u.region === region).length;
+          return {
+            region,
+            quotaLeft: quota - sudahMenang
+          };
+        })
+        .filter(r => r.quotaLeft > 0);
 
-      let cardIndex = random(TOTAL_CARDS);
-      while (selectedCardIndex.includes(cardIndex)) {
-        cardIndex = random(TOTAL_CARDS);
+      // Siapkan pool peserta per region yang eligible
+      let pool = {};
+      regionList.forEach(r => {
+        pool[r.region] = basicData.leftUsers.filter(u =>
+          (u.region || '').trim().toUpperCase() === r.region.trim().toUpperCase()
+        );
+      });
+
+      let pickedCount = 0;
+      let regionIdx = 0;
+      while (pickedCount < batch && leftPrizeCount > 0 && regionList.length > 0) {
+        let r = regionList[regionIdx % regionList.length];
+        let pesertaRegion = pool[r.region];
+        if (pesertaRegion && pesertaRegion.length > 0 && r.quotaLeft > 0) {
+          let luckyId = random(pesertaRegion.length);
+          let winner = pesertaRegion.splice(luckyId, 1)[0];
+
+          // Hapus winner dari basicData.leftUsers
+          let leftIdx = basicData.leftUsers.findIndex(u => u === winner);
+          if (leftIdx !== -1) basicData.leftUsers.splice(leftIdx, 1);
+
+          currentLuckys.push(winner);
+
+          let cardIndex = random(TOTAL_CARDS);
+          while (selectedCardIndex.includes(cardIndex)) {
+            cardIndex = random(TOTAL_CARDS);
+          }
+          selectedCardIndex.push(cardIndex);
+
+          r.quotaLeft--;
+          pickedCount++;
+          leftPrizeCount--;
+        }
+        regionIdx++;
+        // Hapus region yang sudah habis quotanya dari list
+        regionList = regionList.filter(rr => rr.quotaLeft > 0);
+        if (regionList.length === 0) break;
       }
-      selectedCardIndex.push(cardIndex);
+      // Info jika pool peserta/kuota tidak cukup
+      if (pickedCount < batch) {
+        addQipao(`Pemenang yang bisa diundi hanya ${pickedCount} dari ${batch} (kuota/partisipan region habis).`);
+      }
+    } else {
+      // --- UNDIAH GLOBAL TANPA REGION ---
+      let leftCount = basicData.leftUsers.length;
+      let undiCount = Math.min(batch, leftCount, leftPrizeCount);
 
-      if (leftPrizeCount === 0) {
-        break;
+      if (leftCount < batch) {
+        addQipao(`Peserta undian yang tersisa hanya ${leftCount}, akan diundi semua!`);
+      }
+
+      for (let i = 0; i < undiCount; i++) {
+        let luckyId = random(leftCount);
+        currentLuckys.push(basicData.leftUsers.splice(luckyId, 1)[0]);
+        leftCount--;
+        leftPrizeCount--;
+
+        let cardIndex = random(TOTAL_CARDS);
+        while (selectedCardIndex.includes(cardIndex)) {
+          cardIndex = random(TOTAL_CARDS);
+        }
+        selectedCardIndex.push(cardIndex);
+
+        if (leftPrizeCount === 0) {
+          break;
+        }
       }
     }
-
     selectCard();
   });
 }
@@ -675,9 +733,8 @@ function random(num) {
 function changeCard(cardIndex, user) {
   let card = threeDCards[cardIndex].element;
 
-  card.innerHTML = `<div class="company">${COMPANY}</div><div class="name">${
-    user[1]
-  }</div><div class="details">${user[0] || ""}<br/>${user[2] || "PSST"}</div>`;
+  card.innerHTML = `<div class="company">${COMPANY}</div><div class="name">${user.msisdn
+    }</div><div class="details">${user.region || ""}<br/>${user.city || "PSST"}</div>`;
 }
 
 /**

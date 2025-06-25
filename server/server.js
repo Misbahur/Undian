@@ -50,7 +50,7 @@ app.get("/", (req, res) => {
 });
 
 // Mengatur CORS (Cross-Origin Resource Sharing)
-app.all("*", function(req, res, next) {
+app.all("*", function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
@@ -136,11 +136,14 @@ router.post("/errorData", (req, res, next) => {
 
 // Mengekspor data ke Excel
 router.post("/export", (req, res, next) => {
-  let type = [1, 2, 3, 4, 5, defaultType],
-    outData = [["MSISDN", "Region", "Kota"]];
+  let outData = [["MSISDN", "Region", "Kota", "Channel"]]; // Header
+
   cfg.prizes.forEach(item => {
     outData.push([item.text]);
-    outData = outData.concat(luckyData[item.type] || []);
+    const winners = luckyData[item.type] || [];
+    winners.forEach(obj => {
+      outData.push([obj.msisdn, obj.region, obj.city, obj.channel]);
+    });
   });
 
   writeXML(outData, "/Hasil Undian.xlsx")
@@ -152,6 +155,7 @@ router.post("/export", (req, res, next) => {
       log(`Berhasil mengekspor data!`);
     })
     .catch(err => {
+      console.error("Export error:", err);
       res.json({
         type: "error",
         error: err.error
@@ -244,7 +248,7 @@ function getLeftUsers() {
 loadData();
 
 module.exports = {
-  run: function(devPort, noOpen) {
+  run: function (devPort, noOpen) {
     let openBrowser = true;
     if (process.argv.length > 3) {
       if (process.argv[3] && (process.argv[3] + "").toLowerCase() === "n") {
