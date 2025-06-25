@@ -1,47 +1,49 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Undian Acara</title>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
-    />
-    <!-- <link rel="stylesheet" href="./index.css"> -->
-  </head>
 
-  <body>
-    <script src="./lib/three.min.js"></script>
-    <script src="./lib/tween.min.js"></script>
-    <script src="./lib/TrackballControls.js"></script>
-    <script src="./lib/CSS3DRenderer.js"></script>
-    <script src="./lib/ajax.js"></script>
+<head>
+  <title>Undian Acara</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <!-- <link rel="stylesheet" href="./index.css"> -->
+</head>
 
-    <div class="canvas-box">
-      <canvas id="canvas">Browser Anda tidak mendukung canvas</canvas>
-    </div>
+<body>
+  <script src="./lib/three.min.js"></script>
+  <script src="./lib/tween.min.js"></script>
+  <script src="./lib/TrackballControls.js"></script>
+  <script src="./lib/CSS3DRenderer.js"></script>
+  <script src="./lib/ajax.js"></script>
 
-    <div class="music">
-      <audio id="music" src="./data/music.mp3" class="music-item" loop></audio>
-      <div id="musicBox" class="music-box" title="Putar/Pause Musik Latar">Musik</div>
-    </div>
+  <div class="canvas-box">
+    <canvas id="canvas">Browser Anda tidak mendukung canvas</canvas>
+  </div>
 
-    <div id="prizeBar"></div>
+  <div class="music">
+    <audio id="music" src="./data/music.mp3" class="music-item" loop></audio>
+    <div id="musicBox" class="music-box" title="Putar/Pause Musik Latar">Musik</div>
+  </div>
 
-    <div id="container"></div>
+  <div id="prizeBar"></div>
 
-    <div id="menu">
-      <button id="enter">Masuk ke Undian</button>
-      <div id="lotteryBar" class="none">
-        <button id="lottery">Mulai Undian</button>
-        <button id="reLottery">Undi Ulang</button>
-        <div class="fixed-bar">
-          <button id="save" class="fixed-btn">Ekspor Hasil Undian</button>
-          <button id="reset" class="fixed-btn">Reset</button>
-        </div>
+  <div id="container"></div>
+
+  <div id="menu">
+    <button id="enter">Masuk ke Undian</button>
+    <div id="lotteryBar" class="none">
+      <button id="lottery">Mulai Undian</button>
+      <button id="reLottery">Undi Ulang</button>
+
+      <button id="confirmWinnersBtn" class="none">Konfirmasi Pemenang</button>
+      <button id="cancelDrawBtn" class="none">Batalkan & Ulangi Semua</button>
+      <div class="fixed-bar">
+        <button id="save" class="fixed-btn">Ekspor Hasil Undian</button>
+        <button id="reset" class="fixed-btn">Reset</button>
       </div>
     </div>
+  </div>
 
-    <div class="qipao-container"></div>
-  </body>
+  <div class="qipao-container"></div>
+</body>
+
 </html>

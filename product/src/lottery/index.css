@@ -17,7 +17,12 @@ a {
 .none {
   display: none;
 }
-
+/* Tambahkan style ini untuk menandai kartu yang tidak sah */
+.prize.invalidated {
+  opacity: 0.3;
+  border: 3px solid red;
+  transform: scale(0.95);
+}
 #container {
   z-index: 3;
   position: relative;
