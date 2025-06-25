@@ -42,6 +42,7 @@ Lottery
 │   ├── package.json
 │   └── webpack.config.js
 ├── server
+|   |-- data/list.xlsx
 │   ├── config.js
 │   ├── server.js
 │   └── package.js
