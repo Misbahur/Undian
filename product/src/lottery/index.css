@@ -547,6 +547,12 @@ button:active {
   right: 20px;
 }
 
+.left-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+}
+
 .fixed-btn {
   margin: 20px 0 0;
   width: 200px;

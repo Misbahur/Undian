@@ -642,7 +642,7 @@ function resetCard(duration = 500) {
  * @param {object} redrawInfo - (Opsional) Objek berisi pesanan undi ulang per wilayah.
  * Contoh: { JATENG: 1, BALNUS: 2 }
  */
-function lottery(redrawInfo) {
+function lottery(redrawInfo, blacklist = []) {
   btns.lottery.innerHTML = "Hentikan Undian";
   rotateBall().then(() => {
     currentLuckys = [];
@@ -696,7 +696,7 @@ function lottery(redrawInfo) {
           let sudahMenang = luckyData.filter(u => u.region === region).length;
           return { region, quotaLeft: quota - sudahMenang };
         }).filter(r => r.quotaLeft > 0);
-        let pool = {};
+        let pool = basicData.leftUsers.filter(u => !blacklist.includes(u));
         regionList.forEach(r => {
           pool[r.region] = basicData.leftUsers.filter(u => (u.region || '').trim().toUpperCase() === r.region.trim().toUpperCase());
         });
@@ -755,6 +755,7 @@ function lottery(redrawInfo) {
     }
 
     selectCard();
+    resolve(currentLuckys.slice()); // Return hasil undian
   });
 }
 
@@ -762,58 +763,14 @@ function lottery(redrawInfo) {
  * Menyimpan hasil undian sebelumnya
  */
 // GANTI SELURUH FUNGSI SAVEDATA ANDA DENGAN INI
-function saveData(winnersToSave) {
-  if (!currentPrize) {
-    return Promise.resolve();
-  }
-
+function saveData(winnersToSave, prizeType) {
+  if (!prizeType) prizeType = currentPrize.type;
   const luckys = winnersToSave !== undefined ? winnersToSave : currentLuckys;
-  if (!luckys || luckys.length === 0) {
-    return Promise.resolve();
-  }
-
-  let type = currentPrize.type;
-  let existingLuckys = basicData.luckyUsers[type] || [];
+  if (!luckys || luckys.length === 0) return Promise.resolve();
+  let existingLuckys = basicData.luckyUsers[prizeType] || [];
   const allLuckysForPrize = existingLuckys.concat(luckys);
-  basicData.luckyUsers[type] = allLuckysForPrize;
-
-  // Di sinilah perpindahan hadiah berpotensi terjadi
-  if (currentPrize.count <= allLuckysForPrize.length) {
-    // ===================================================================
-    // KITA PASANG MATA-MATA SUPER LENGKAP DI SINI
-    console.group(`--- HADIAH '${currentPrize.title}' SUDAH HABIS, MEMULAI PERPINDAHAN ---`);
-    console.log("Kondisi SEBELUM pindah:");
-    console.log("Index Hadiah LAMA:", currentPrizeIndex);
-    console.log("Total Pemenang Tercatat:", allLuckysForPrize.length);
-    console.log("Kuota Hadiah:", currentPrize.count);
-    
-    // Pindah ke hadiah berikutnya
-    currentPrizeIndex--;
-    if (currentPrizeIndex < 0) { // Pakai < 0 agar lebih aman
-      currentPrizeIndex = 0; // Atau hentikan jika semua benar-benar habis
-    }
-    currentPrize = basicData.prizes[currentPrizeIndex];
-
-    console.log("-----------------------------------------");
-    console.log("Kondisi SETELAH pindah:");
-    console.log("Index Hadiah BARU:", currentPrizeIndex);
-    console.log("Objek Hadiah BARU:", currentPrize);
-
-    // Langsung periksa kondisi untuk hadiah baru ini
-    const nextLuckyData = basicData.luckyUsers[currentPrize.type] || [];
-    console.log("Pemenang untuk hadiah BARU (seharusnya kosong):", nextLuckyData);
-    
-    const nextLeftCount = currentPrize.count - nextLuckyData.length;
-    console.log(`Perhitungan sisa hadiah untuk hadiah BARU: ${currentPrize.count} - ${nextLuckyData.length} = ${nextLeftCount}`);
-    
-    if (nextLeftCount <= 0) {
-        console.error("!!! MASALAH TERDETEKSI: Sisa hadiah untuk hadiah berikutnya sudah 0. Ini penyebab macet.");
-    }
-    console.groupEnd();
-    // ===================================================================
-  }
-
-  return setData(type, luckys);
+  basicData.luckyUsers[prizeType] = allLuckysForPrize;
+  return setData(prizeType, luckys);
 }
 
 function changePrize() {
@@ -982,11 +939,14 @@ function createHighlight() {
 function handleConfirm() {
   setLotteryStatus(true);
 
+  // Kunci type hadiah yang sedang diundi SEKARANG
+  const prizeType = currentPrize.type;
+
+  // 1. Pisahkan pemenang valid dan invalid
   const validWinners = currentLuckys.filter(
-    lucky => !invalidatedLuckys.find(invalid => invalid === lucky)
+    lucky => !invalidatedLuckys.includes(lucky)
   );
   const usersToReturn = invalidatedLuckys;
-
   const redrawInfo = usersToReturn.reduce((acc, user) => {
     const region = user.region;
     if (region) {
@@ -996,38 +956,60 @@ function handleConfirm() {
     }
     return acc;
   }, {});
-  
+
+  // 2. Blacklist peserta invalid
+  window.invalidBlacklist = window.invalidBlacklist || [];
   usersToReturn.forEach(user => {
-    basicData.leftUsers.push(user);
+    if (!window.invalidBlacklist.includes(user)) {
+      window.invalidBlacklist.push(user);
+    }
   });
 
-  // 1. Simpan dulu pemenang yang sudah pasti SAH
-  saveData(validWinners).then(() => {
+  // 3. Simpan pemenang sah ke hadiah yang BENAR (gunakan prizeType yang dikunci)
+  saveData(validWinners, prizeType).then(() => {
     resetUIAndCards().then(() => {
       if (Object.keys(redrawInfo).length > 0) {
         addQipao(`Mengundi ulang untuk ${Object.values(redrawInfo).reduce((a, b) => a + b, 0)} slot yang kosong...`);
-        
-        // 2. Jalankan undian ulang DAN TANGKAP HASILNYA dengan .then()
-        lottery(redrawInfo).then(newlyDrawnWinners => {
-          console.log("Pemenang hasil undi ulang:", newlyDrawnWinners);
-          
-          // 3. SIMPAN PEMENANG BARU HASIL UNDI ULANG
+
+        // 4. Undian ulang, pool peserta harus exclude blacklist
+        lottery(redrawInfo, window.invalidBlacklist).then(newlyDrawnWinners => {
           if (newlyDrawnWinners && newlyDrawnWinners.length > 0) {
-            saveData(newlyDrawnWinners).then(() => {
+            // SIMPAN ke hadiah yang BENAR (masih pakai prizeType yang dikunci)
+            saveData(newlyDrawnWinners, prizeType).then(() => {
+              checkAndMoveToNextPrize();
               addQipao("Undi ulang selesai dan semua pemenang telah disimpan!");
               setLotteryStatus(false);
             });
           } else {
+            checkAndMoveToNextPrize();
             addQipao("Undi ulang selesai.");
             setLotteryStatus(false);
           }
         });
       } else {
+        checkAndMoveToNextPrize();
         addQipao("Semua pemenang telah dikonfirmasi!");
         setLotteryStatus(false);
       }
     });
   });
+}
+
+
+function checkAndMoveToNextPrize() {
+  const luckyData = basicData.luckyUsers[currentPrize.type] || [];
+  if (luckyData.length >= currentPrize.count) {
+    // Pindah ke hadiah berikutnya (index turun)
+    currentPrizeIndex--;
+    if (currentPrizeIndex >= 0) {
+      currentPrize = basicData.prizes[currentPrizeIndex];
+      showPrizeList(currentPrizeIndex);
+      setPrizeData(currentPrizeIndex, (basicData.luckyUsers[currentPrize.type] || []).length, true);
+      addQipao(`Berpindah ke hadiah berikutnya: ${currentPrize.title}`);
+    } else {
+      addQipao("Semua hadiah sudah diundi!");
+    }
+  }
 }
 
 function handleCancel() {
