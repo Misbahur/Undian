@@ -6,7 +6,7 @@ import {
   setPrizes,
   showPrizeList,
   setPrizeData,
-  resetPrize
+  resetPrize,
 } from "./prizeList";
 import { NUMBER_MATRIX, LETTER_MATRIX } from "./config.js";
 
@@ -18,7 +18,7 @@ let TOTAL_CARDS,
   btns = {
     enter: document.querySelector("#enter"),
     lotteryBar: document.querySelector("#lotteryBar"),
-    lottery: document.querySelector("#lottery")
+    lottery: document.querySelector("#lottery"),
   },
   prizes,
   EACH_COUNT,
@@ -36,7 +36,7 @@ let camera,
   threeDCards = [],
   targets = {
     table: [],
-    sphere: []
+    sphere: [],
   };
 
 let rotateObj;
@@ -47,7 +47,7 @@ let selectedCardIndex = [],
     prizes: [], //Informasi hadiah
     users: [], //Semua peserta
     luckyUsers: {}, //Peserta yang sudah menang
-    leftUsers: [] //Peserta yang belum menang
+    leftUsers: [], //Peserta yang belum menang
   },
   interval,
   // Hadiah yang sedang diundi, mulai dari hadiah terkecil sampai hadiah utama
@@ -84,7 +84,8 @@ function initAll() {
       for (; prizeIndex > -1; prizeIndex--) {
         if (
           data.luckyData[prizeIndex] &&
-          data.luckyData[prizeIndex].length >= basicData.prizes[prizeIndex].count
+          data.luckyData[prizeIndex].length >=
+            basicData.prizes[prizeIndex].count
         ) {
           continue;
         }
@@ -96,7 +97,7 @@ function initAll() {
       showPrizeList(currentPrizeIndex);
       let curLucks = basicData.luckyUsers[currentPrize.type];
       setPrizeData(currentPrizeIndex, curLucks ? curLucks.length : 0, true);
-    }
+    },
   });
 
   window.AJAX({
@@ -106,13 +107,21 @@ function initAll() {
       // FIX: Selalu update leftUsers juga!
       basicData.leftUsers = data.slice();
       // DEBUG: cek isi peserta
-      console.log("Peserta users:", basicData.users.length, basicData.users.slice(0, 3));
-      console.log("Peserta leftUsers:", basicData.leftUsers.length, basicData.leftUsers.slice(0, 3));
+      console.log(
+        "Peserta users:",
+        basicData.users.length,
+        basicData.users.slice(0, 3),
+      );
+      console.log(
+        "Peserta leftUsers:",
+        basicData.leftUsers.length,
+        basicData.leftUsers.slice(0, 3),
+      );
 
       initCards();
       animate();
       shineCard();
-    }
+    },
   });
 }
 
@@ -127,14 +136,14 @@ function initCards() {
     totalMember = member.length,
     position = {
       x: (140 * COLUMN_COUNT - 20) / 2,
-      y: (180 * ROW_COUNT - 20) / 2
+      y: (180 * ROW_COUNT - 20) / 2,
     };
 
   camera = new THREE.PerspectiveCamera(
     40,
     window.innerWidth / window.innerHeight,
     1,
-    10000
+    10000,
   );
   camera.position.z = 3000;
 
@@ -147,7 +156,7 @@ function initCards() {
         member[index % length],
         isBold,
         index,
-        showTable
+        showTable,
       );
 
       var object = new THREE.CSS3DObject(element);
@@ -240,7 +249,7 @@ function bindEvent() {
       // Reset
       case "reset":
         let doREset = window.confirm(
-          "Apakah Anda yakin ingin mereset data? Setelah reset, semua hadiah yang sudah diundi akan dikosongkan?"
+          "Apakah Anda yakin ingin mereset data? Setelah reset, semua hadiah yang sudah diundi akan dikosongkan?",
         );
         if (!doREset) {
           return;
@@ -267,7 +276,7 @@ function bindEvent() {
         // Hapus saveData() dari sini. Kita simpan setelah konfirmasi.
         //Perbarui tampilan jumlah undian yang tersisa
         changePrize();
-        resetCard().then(res => {
+        resetCard().then((res) => {
           // Mengundi
           lottery();
         });
@@ -284,28 +293,27 @@ function bindEvent() {
         setLotteryStatus(true);
         // Langsung mengundi tanpa menyimpan data undian sebelumnya
         // Mengundi
-        resetCard().then(res => {
+        resetCard().then((res) => {
           // Mengundi
           lottery();
         });
         break;
       // Ekspor hasil undian
       case "save":
-        saveData().then(res => {
-          resetCard().then(res => {
-            // Kosongkan catatan sebelumnya
-            currentLuckys = [];
-          });
-          exportData();
-          addQipao(`Data telah disimpan ke dalam EXCEL.`);
-        });
+        exportData();
+        addQipao(`Data telah disimpan ke dalam EXCEL.`);
+
         break;
     }
   });
 
   // Tambahkan event listener BARU untuk tombol konfirmasi
-  document.querySelector('#confirmWinnersBtn').addEventListener('click', handleConfirm);
-  document.querySelector('#cancelDrawBtn').addEventListener('click', handleCancel);
+  document
+    .querySelector("#confirmWinnersBtn")
+    .addEventListener("click", handleConfirm);
+  document
+    .querySelector("#cancelDrawBtn")
+    .addEventListener("click", handleCancel);
 
   // ... (event listener untuk resize tetap sama) ...
   window.addEventListener("resize", onWindowResize, false);
@@ -363,13 +371,13 @@ function createCard(user, isBold, id, showTable) {
 }
 
 function removeHighlight() {
-  document.querySelectorAll(".highlight").forEach(node => {
+  document.querySelectorAll(".highlight").forEach((node) => {
     node.classList.remove("highlight");
   });
 }
 
 function addHighlight() {
-  document.querySelectorAll(".lightitem").forEach(node => {
+  document.querySelectorAll(".lightitem").forEach((node) => {
     node.classList.add("highlight");
   });
 }
@@ -388,9 +396,9 @@ function transform(targets, duration) {
         {
           x: target.position.x,
           y: target.position.y,
-          z: target.position.z
+          z: target.position.z,
         },
-        Math.random() * duration + duration
+        Math.random() * duration + duration,
       )
       .easing(TWEEN.Easing.Exponential.InOut)
       .start();
@@ -400,9 +408,9 @@ function transform(targets, duration) {
         {
           x: target.rotation.x,
           y: target.rotation.y,
-          z: target.rotation.z
+          z: target.rotation.z,
         },
-        Math.random() * duration + duration
+        Math.random() * duration + duration,
       )
       .easing(TWEEN.Easing.Exponential.InOut)
       .start();
@@ -421,9 +429,9 @@ function rotateBall() {
     rotateObj
       .to(
         {
-          y: Math.PI * 6 * ROTATE_LOOP
+          y: Math.PI * 6 * ROTATE_LOOP,
         },
-        ROTATE_TIME * ROTATE_LOOP
+        ROTATE_TIME * ROTATE_LOOP,
       )
       .onUpdate(render)
       // .easing(TWEEN.Easing.Linear)
@@ -456,7 +464,7 @@ function render() {
 }
 
 // Variabel global baru di bagian atas file
-let invalidatedLuckys = []; 
+let invalidatedLuckys = [];
 function selectCard(duration = 600) {
   rotate = false;
   let width = 140,
@@ -472,7 +480,7 @@ function selectCard(duration = 600) {
     for (let i = 0; i < mid; i++) {
       locates.push({
         x: tag * width * Resolution,
-        y: yPosition[0] * Resolution
+        y: yPosition[0] * Resolution,
       });
       tag++;
     }
@@ -481,7 +489,7 @@ function selectCard(duration = 600) {
     for (let i = mid; i < l; i++) {
       locates.push({
         x: tag * width * Resolution,
-        y: yPosition[1] * Resolution
+        y: yPosition[1] * Resolution,
       });
       tag++;
     }
@@ -489,15 +497,15 @@ function selectCard(duration = 600) {
     for (let i = selectedCardIndex.length; i > 0; i--) {
       locates.push({
         x: tag * width * Resolution,
-        y: 0 * Resolution
+        y: 0 * Resolution,
       });
       tag++;
     }
   }
 
-  let text = currentLuckys.map(item => item[1]);
+  let text = currentLuckys.map((item) => item[1]);
   addQipao(
-    `Selamat kepada ${text.join(", ")} memenangkan ${currentPrize.title}, SEmarak HAdiah pelanggan.`
+    `Selamat kepada ${text.join(", ")} memenangkan ${currentPrize.title}, SEmarak HAdiah pelanggan.`,
   );
 
   selectedCardIndex.forEach((cardIndex, index) => {
@@ -508,9 +516,9 @@ function selectCard(duration = 600) {
         {
           x: locates[index].x,
           y: locates[index].y * Resolution,
-          z: 2200
+          z: 2200,
         },
-        Math.random() * duration + duration
+        Math.random() * duration + duration,
       )
       .easing(TWEEN.Easing.Exponential.InOut)
       .start();
@@ -520,9 +528,9 @@ function selectCard(duration = 600) {
         {
           x: 0,
           y: 0,
-          z: 0
+          z: 0,
         },
-        Math.random() * duration + duration
+        Math.random() * duration + duration,
       )
       .easing(TWEEN.Easing.Exponential.InOut)
       .start();
@@ -545,41 +553,43 @@ function selectCard(duration = 600) {
 
 // GANTI SELURUH FUNGSI INI DENGAN VERSI BARU
 function enterConfirmationMode() {
-    btns.lottery.classList.add('none');
-    document.querySelector('#reLottery').classList.add('none');
-    document.querySelector('#confirmWinnersBtn').classList.remove('none');
-    document.querySelector('#cancelDrawBtn').classList.remove('none');
-    invalidatedLuckys = [];
+  btns.lottery.classList.add("none");
+  document.querySelector("#reLottery").classList.add("none");
+  document.querySelector("#confirmWinnersBtn").classList.remove("none");
+  document.querySelector("#cancelDrawBtn").classList.remove("none");
+  invalidatedLuckys = [];
 
-    selectedCardIndex.forEach((cardIndex, index) => {
-        const cardElement = threeDCards[cardIndex].element;
-        const luckyUser = currentLuckys[index];
+  selectedCardIndex.forEach((cardIndex, index) => {
+    const cardElement = threeDCards[cardIndex].element;
+    const luckyUser = currentLuckys[index];
 
-        const cardClickHandler = () => {
-            console.group(`--- MENG-KLIK KARTU PEMENANG ---`);
-            console.log("Data Pemenang yang di-klik:", luckyUser);
+    const cardClickHandler = () => {
+      console.group(`--- MENG-KLIK KARTU PEMENANG ---`);
+      console.log("Data Pemenang yang di-klik:", luckyUser);
 
-            cardElement.classList.toggle('invalidated');
+      cardElement.classList.toggle("invalidated");
 
-            // === PERBAIKAN UTAMA DI SINI ===
-            // Kita bandingkan objeknya secara langsung, bukan hanya ID-nya. Ini lebih andal.
-            const invalidatedIndex = invalidatedLuckys.findIndex(user => user === luckyUser);
+      // === PERBAIKAN UTAMA DI SINI ===
+      // Kita bandingkan objeknya secara langsung, bukan hanya ID-nya. Ini lebih andal.
+      const invalidatedIndex = invalidatedLuckys.findIndex(
+        (user) => user === luckyUser,
+      );
 
-            if (invalidatedIndex > -1) {
-                // Jika sudah ada, hapus (artinya pembatalan 'tidak sah')
-                invalidatedLuckys.splice(invalidatedIndex, 1);
-            } else {
-                // Jika belum ada, tambahkan
-                invalidatedLuckys.push(luckyUser);
-            }
-            
-            console.log("Isi 'invalidatedLuckys' sekarang:", invalidatedLuckys);
-            console.groupEnd();
-        };
+      if (invalidatedIndex > -1) {
+        // Jika sudah ada, hapus (artinya pembatalan 'tidak sah')
+        invalidatedLuckys.splice(invalidatedIndex, 1);
+      } else {
+        // Jika belum ada, tambahkan
+        invalidatedLuckys.push(luckyUser);
+      }
 
-        cardElement.handler = cardClickHandler;
-        cardElement.addEventListener('click', cardElement.handler);
-    });
+      console.log("Isi 'invalidatedLuckys' sekarang:", invalidatedLuckys);
+      console.groupEnd();
+    };
+
+    cardElement.handler = cardClickHandler;
+    cardElement.addEventListener("click", cardElement.handler);
+  });
 }
 
 /**
@@ -590,7 +600,7 @@ function resetCard(duration = 500) {
     return Promise.resolve();
   }
 
-  selectedCardIndex.forEach(index => {
+  selectedCardIndex.forEach((index) => {
     let object = threeDCards[index],
       target = targets.sphere[index];
 
@@ -599,9 +609,9 @@ function resetCard(duration = 500) {
         {
           x: target.position.x,
           y: target.position.y,
-          z: target.position.z
+          z: target.position.z,
         },
-        Math.random() * duration + duration
+        Math.random() * duration + duration,
       )
       .easing(TWEEN.Easing.Exponential.InOut)
       .start();
@@ -611,9 +621,9 @@ function resetCard(duration = 500) {
         {
           x: target.rotation.x,
           y: target.rotation.y,
-          z: target.rotation.z
+          z: target.rotation.z,
         },
-        Math.random() * duration + duration
+        Math.random() * duration + duration,
       )
       .easing(TWEEN.Easing.Exponential.InOut)
       .start();
@@ -625,7 +635,7 @@ function resetCard(duration = 500) {
       .onUpdate(render)
       .start()
       .onComplete(() => {
-        selectedCardIndex.forEach(index => {
+        selectedCardIndex.forEach((index) => {
           let object = threeDCards[index];
           object.element.classList.remove("prize");
         });
@@ -644,6 +654,7 @@ function resetCard(duration = 500) {
  */
 function lottery(redrawInfo, blacklist = []) {
   btns.lottery.innerHTML = "Hentikan Undian";
+
   rotateBall().then(() => {
     currentLuckys = [];
     selectedCardIndex = [];
@@ -653,15 +664,21 @@ function lottery(redrawInfo, blacklist = []) {
     if (isRedraw) {
       // --- BLOK UNDIAN ULANG SPESIFIK (SUDAH BENAR) ---
       console.log("Menjalankan mode UNDI ULANG dengan pesanan:", redrawInfo);
-      let leftPrizeCount = currentPrize.count - (basicData.luckyUsers[currentPrize.type] || []).length;
+      let leftPrizeCount =
+        currentPrize.count -
+        (basicData.luckyUsers[currentPrize.type] || []).length;
       for (const region in redrawInfo) {
         const countNeeded = redrawInfo[region];
-        const regionalPool = basicData.leftUsers.filter(u => (u.region || 'GLOBAL').trim().toUpperCase() === region.trim().toUpperCase());
+        const regionalPool = basicData.leftUsers.filter(
+          (u) =>
+            (u.region || "GLOBAL").trim().toUpperCase() ===
+            region.trim().toUpperCase(),
+        );
         for (let i = 0; i < countNeeded; i++) {
           if (regionalPool.length > 0 && leftPrizeCount > 0) {
             let luckyId = random(regionalPool.length);
             let winner = regionalPool.splice(luckyId, 1)[0];
-            let leftIdx = basicData.leftUsers.findIndex(u => u === winner);
+            let leftIdx = basicData.leftUsers.findIndex((u) => u === winner);
             if (leftIdx !== -1) basicData.leftUsers.splice(leftIdx, 1);
             currentLuckys.push(winner);
             leftPrizeCount--;
@@ -671,7 +688,9 @@ function lottery(redrawInfo, blacklist = []) {
             }
             selectedCardIndex.push(cardIndex);
           } else {
-            addQipao(`Peserta dari wilayah ${region} tidak cukup untuk diundi ulang.`);
+            addQipao(
+              `Peserta dari wilayah ${region} tidak cukup untuk diundi ulang.`,
+            );
             break;
           }
         }
@@ -692,26 +711,38 @@ function lottery(redrawInfo, blacklist = []) {
       const countForThisTurn = Math.min(batch, leftPrizeCount);
 
       if (currentPrize.regionQuota) {
-        let regionList = Object.entries(currentPrize.regionQuota).map(([region, quota]) => {
-          let sudahMenang = luckyData.filter(u => u.region === region).length;
-          return { region, quotaLeft: quota - sudahMenang };
-        }).filter(r => r.quotaLeft > 0);
-        let pool = basicData.leftUsers.filter(u => !blacklist.includes(u));
-        regionList.forEach(r => {
-          pool[r.region] = basicData.leftUsers.filter(u => (u.region || '').trim().toUpperCase() === r.region.trim().toUpperCase());
+        let regionList = Object.entries(currentPrize.regionQuota)
+          .map(([region, quota]) => {
+            let sudahMenang = luckyData.filter(
+              (u) => u.region === region,
+            ).length;
+            return { region, quotaLeft: quota - sudahMenang };
+          })
+          .filter((r) => r.quotaLeft > 0);
+        let pool = basicData.leftUsers.filter((u) => !blacklist.includes(u));
+        regionList.forEach((r) => {
+          pool[r.region] = basicData.leftUsers.filter(
+            (u) =>
+              (u.region || "").trim().toUpperCase() ===
+              r.region.trim().toUpperCase(),
+          );
         });
 
         // === PERBAIKAN: Definisi diletakkan di sini, sebelum digunakan ===
         let pickedCount = 0;
         let regionIdx = 0;
 
-        while (pickedCount < countForThisTurn && leftPrizeCount > 0 && regionList.length > 0) {
+        while (
+          pickedCount < countForThisTurn &&
+          leftPrizeCount > 0 &&
+          regionList.length > 0
+        ) {
           let r = regionList[regionIdx % regionList.length];
           let pesertaRegion = pool[r.region];
           if (pesertaRegion && pesertaRegion.length > 0 && r.quotaLeft > 0) {
             let luckyId = random(pesertaRegion.length);
             let winner = pesertaRegion.splice(luckyId, 1)[0];
-            let leftIdx = basicData.leftUsers.findIndex(u => u === winner);
+            let leftIdx = basicData.leftUsers.findIndex((u) => u === winner);
             if (leftIdx !== -1) basicData.leftUsers.splice(leftIdx, 1);
             currentLuckys.push(winner);
             let cardIndex = random(TOTAL_CARDS);
@@ -724,18 +755,22 @@ function lottery(redrawInfo, blacklist = []) {
             leftPrizeCount--;
           }
           regionIdx++;
-          regionList = regionList.filter(rr => rr.quotaLeft > 0);
+          regionList = regionList.filter((rr) => rr.quotaLeft > 0);
           if (regionList.length === 0) break;
         }
         if (pickedCount < countForThisTurn) {
-          addQipao(`Pemenang yang bisa diundi hanya ${pickedCount} dari ${countForThisTurn} (kuota/partisipan region habis).`);
+          addQipao(
+            `Pemenang yang bisa diundi hanya ${pickedCount} dari ${countForThisTurn} (kuota/partisipan region habis).`,
+          );
         }
       } else {
         // Logika undian global tanpa region
         let leftCount = basicData.leftUsers.length;
         let undiCount = Math.min(countForThisTurn, leftCount);
         if (leftCount < countForThisTurn) {
-          addQipao(`Peserta undian yang tersisa hanya ${leftCount}, akan diundi semua!`);
+          addQipao(
+            `Peserta undian yang tersisa hanya ${leftCount}, akan diundi semua!`,
+          );
         }
         for (let i = 0; i < undiCount; i++) {
           let luckyId = random(leftCount);
@@ -754,8 +789,9 @@ function lottery(redrawInfo, blacklist = []) {
       }
     }
 
+    console.log(currentLuckys.slice());
     selectCard();
-    resolve(currentLuckys.slice()); // Return hasil undian
+    Promise.resolve(currentLuckys.slice()); // Return hasil undian
   });
 }
 
@@ -793,9 +829,10 @@ function random(num) {
 function changeCard(cardIndex, user) {
   let card = threeDCards[cardIndex].element;
 
-  card.innerHTML = `<div class="company">${COMPANY}</div><div class="name">${user.msisdn
-    }</div>`;
-    // <div class="details">${user.region || ""}<br/>${user.city || "PSST"}</div>
+  card.innerHTML = `<div class="company">${COMPANY}</div><div class="name">${
+    user.msisdn
+  }</div>`;
+  // <div class="details">${user.region || ""}<br/>${user.city || "PSST"}</div>
 }
 
 /**
@@ -840,14 +877,14 @@ function setData(type, data) {
       url: "/saveData",
       data: {
         type,
-        data
+        data,
       },
       success() {
         resolve();
       },
       error() {
         reject();
-      }
+      },
     });
   });
 }
@@ -857,14 +894,14 @@ function setErrorData(data) {
     window.AJAX({
       url: "/errorData",
       data: {
-        data
+        data,
       },
       success() {
         resolve();
       },
       error() {
         reject();
-      }
+      },
     });
   });
 }
@@ -876,7 +913,7 @@ function exportData() {
       if (data.type === "success") {
         location.href = data.url;
       }
-    }
+    },
   });
 }
 
@@ -885,7 +922,7 @@ function reset() {
     url: "/reset",
     success(data) {
       console.log("Reset berhasil");
-    }
+    },
   });
 }
 
@@ -915,16 +952,16 @@ function createHighlight() {
   let yoffset = 1;
   let highlight = [];
 
-  const totalWidth = (word.length * step) - (step - 3);
+  const totalWidth = word.length * step - (step - 3);
   const gridWidth = COLUMN_COUNT;
   xoffset = Math.floor((gridWidth - totalWidth) / 2);
 
-  word.split("").forEach(char => {
+  word.split("").forEach((char) => {
     if (LETTER_MATRIX[char]) {
       highlight = highlight.concat(
-        LETTER_MATRIX[char].map(item => {
+        LETTER_MATRIX[char].map((item) => {
           return `${item[0] + xoffset}-${item[1] + yoffset}`;
-        })
+        }),
       );
     }
     xoffset += step;
@@ -944,7 +981,7 @@ function handleConfirm() {
 
   // 1. Pisahkan pemenang valid dan invalid
   const validWinners = currentLuckys.filter(
-    lucky => !invalidatedLuckys.includes(lucky)
+    (lucky) => !invalidatedLuckys.includes(lucky),
   );
   const usersToReturn = invalidatedLuckys;
   const redrawInfo = usersToReturn.reduce((acc, user) => {
@@ -959,7 +996,7 @@ function handleConfirm() {
 
   // 2. Blacklist peserta invalid
   window.invalidBlacklist = window.invalidBlacklist || [];
-  usersToReturn.forEach(user => {
+  usersToReturn.forEach((user) => {
     if (!window.invalidBlacklist.includes(user)) {
       window.invalidBlacklist.push(user);
     }
@@ -969,23 +1006,29 @@ function handleConfirm() {
   saveData(validWinners, prizeType).then(() => {
     resetUIAndCards().then(() => {
       if (Object.keys(redrawInfo).length > 0) {
-        addQipao(`Mengundi ulang untuk ${Object.values(redrawInfo).reduce((a, b) => a + b, 0)} slot yang kosong...`);
+        addQipao(
+          `Mengundi ulang untuk ${Object.values(redrawInfo).reduce((a, b) => a + b, 0)} slot yang kosong...`,
+        );
 
         // 4. Undian ulang, pool peserta harus exclude blacklist
-        lottery(redrawInfo, window.invalidBlacklist).then(newlyDrawnWinners => {
-          if (newlyDrawnWinners && newlyDrawnWinners.length > 0) {
-            // SIMPAN ke hadiah yang BENAR (masih pakai prizeType yang dikunci)
-            saveData(newlyDrawnWinners, prizeType).then(() => {
+        lottery(redrawInfo, window.invalidBlacklist).then(
+          (newlyDrawnWinners) => {
+            if (newlyDrawnWinners && newlyDrawnWinners.length > 0) {
+              // SIMPAN ke hadiah yang BENAR (masih pakai prizeType yang dikunci)
+              saveData(newlyDrawnWinners, prizeType).then(() => {
+                checkAndMoveToNextPrize();
+                addQipao(
+                  "Undi ulang selesai dan semua pemenang telah disimpan!",
+                );
+                setLotteryStatus(false);
+              });
+            } else {
               checkAndMoveToNextPrize();
-              addQipao("Undi ulang selesai dan semua pemenang telah disimpan!");
+              addQipao("Undi ulang selesai.");
               setLotteryStatus(false);
-            });
-          } else {
-            checkAndMoveToNextPrize();
-            addQipao("Undi ulang selesai.");
-            setLotteryStatus(false);
-          }
-        });
+            }
+          },
+        );
       } else {
         checkAndMoveToNextPrize();
         addQipao("Semua pemenang telah dikonfirmasi!");
@@ -993,8 +1036,11 @@ function handleConfirm() {
       }
     });
   });
-}
 
+  console.log("valid winners", validWinners);
+
+  console.log("prive type", prizeType);
+}
 
 function checkAndMoveToNextPrize() {
   const luckyData = basicData.luckyUsers[currentPrize.type] || [];
@@ -1004,7 +1050,11 @@ function checkAndMoveToNextPrize() {
     if (currentPrizeIndex >= 0) {
       currentPrize = basicData.prizes[currentPrizeIndex];
       showPrizeList(currentPrizeIndex);
-      setPrizeData(currentPrizeIndex, (basicData.luckyUsers[currentPrize.type] || []).length, true);
+      setPrizeData(
+        currentPrizeIndex,
+        (basicData.luckyUsers[currentPrize.type] || []).length,
+        true,
+      );
       addQipao(`Berpindah ke hadiah berikutnya: ${currentPrize.title}`);
     } else {
       addQipao("Semua hadiah sudah diundi!");
@@ -1013,33 +1063,33 @@ function checkAndMoveToNextPrize() {
 }
 
 function handleCancel() {
-    // Fungsi ini sederhana, hanya mereset ke keadaan sebelum undian
-    addQipao("Undian saat ini dibatalkan, semua pemenang akan diundi ulang.");
-    resetUIAndCards().then(() => {
-        setLotteryStatus(false);
-    });
+  // Fungsi ini sederhana, hanya mereset ke keadaan sebelum undian
+  addQipao("Undian saat ini dibatalkan, semua pemenang akan diundi ulang.");
+  resetUIAndCards().then(() => {
+    setLotteryStatus(false);
+  });
 }
 
 // Fungsi helper untuk membersihkan UI
 function resetUIAndCards() {
-    // Sembunyikan tombol konfirmasi
-    document.querySelector('#confirmWinnersBtn').classList.add('none');
-    document.querySelector('#cancelDrawBtn').classList.add('none');
-    
-    // Tampilkan kembali tombol utama
-    btns.lottery.classList.remove('none');
-    document.querySelector('#reLottery').classList.remove('none');
+  // Sembunyikan tombol konfirmasi
+  document.querySelector("#confirmWinnersBtn").classList.add("none");
+  document.querySelector("#cancelDrawBtn").classList.add("none");
 
-    // Hapus event listener dari kartu-kartu
-    selectedCardIndex.forEach(cardIndex => {
-        const cardElement = threeDCards[cardIndex].element;
-        if (cardElement.handler) {
-            cardElement.removeEventListener('click', cardElement.handler);
-        }
-    });
+  // Tampilkan kembali tombol utama
+  btns.lottery.classList.remove("none");
+  document.querySelector("#reLottery").classList.remove("none");
 
-    // Reset visual kartu
-    return resetCard(); 
+  // Hapus event listener dari kartu-kartu
+  selectedCardIndex.forEach((cardIndex) => {
+    const cardElement = threeDCards[cardIndex].element;
+    if (cardElement.handler) {
+      cardElement.removeEventListener("click", cardElement.handler);
+    }
+  });
+
+  // Reset visual kartu
+  return resetCard();
 }
 
 let onload = window.onload;
@@ -1076,14 +1126,14 @@ window.onload = function () {
           },
           () => {
             addQipao("Musik latar gagal diputar otomatis, harap putar manual!");
-          }
+          },
         );
       } else {
         music.pause();
         stopAnimate = true;
       }
     },
-    false
+    false,
   );
 
   setTimeout(function () {
