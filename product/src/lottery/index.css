@@ -86,7 +86,7 @@ a {
 
 .element .name {
   position: absolute;
-  top: 4.6vh;
+  top: 50%;
   left: 0;
   right: 0;
   font-size: 1.4vh;

@@ -23,7 +23,7 @@ let TOTAL_CARDS,
   prizes,
   EACH_COUNT,
   ROW_COUNT = 7,
-  COLUMN_COUNT = 19,
+  COLUMN_COUNT = 25,
   COMPANY,
   HIGHLIGHT_CELL = [],
   // Rasio resolusi saat ini
@@ -358,7 +358,7 @@ function createCard(user, isBold, id, showTable) {
 
   element.appendChild(createElement("name", user.msisdn || "-"));
 
-  element.appendChild(createElement("details", user.region + "<br/>" + user.city));
+  // element.appendChild(createElement("details", user.region + "<br/>" + user.city));
   return element;
 }
 
@@ -837,7 +837,8 @@ function changeCard(cardIndex, user) {
   let card = threeDCards[cardIndex].element;
 
   card.innerHTML = `<div class="company">${COMPANY}</div><div class="name">${user.msisdn
-    }</div><div class="details">${user.region || ""}<br/>${user.city || "PSST"}</div>`;
+    }</div>`;
+    // <div class="details">${user.region || ""}<br/>${user.city || "PSST"}</div>
 }
 
 /**
@@ -951,7 +952,7 @@ function reset() {
 // }
 
 function createHighlight() {
-  let word = "SETIA";
+  let word = "SEHATI";
   let step = 4;
   let xoffset = 1;
   let yoffset = 1;

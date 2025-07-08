@@ -9,7 +9,7 @@
 const prizes = [
   {
     type: 0,
-    count: 1000,
+    count: 0,
     title: "",
     text: "Hadiah Spesial"
   },

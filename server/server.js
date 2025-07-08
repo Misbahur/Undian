@@ -134,17 +134,30 @@ router.post("/errorData", (req, res, next) => {
     });
 });
 
-// Mengekspor data ke Excel
+// GANTI SELURUH BLOK EKSPOR ANDA DENGAN VERSI FINAL INI
 router.post("/export", (req, res, next) => {
-  let outData = [["MSISDN", "Region", "Kota", "Channel"]]; // Header
+  let outData = [["MSISDN", "Hadiah"]];
 
-  cfg.prizes.forEach(item => {
-    outData.push([item.text]);
-    const winners = luckyData[item.type] || [];
-    winners.forEach(obj => {
-      outData.push([obj.msisdn, obj.region, obj.city, obj.channel]);
-    });
-  });
+  for (const prizeType in luckyData) {
+    // === PERBAIKAN UTAMA DI SINI ===
+    // Ubah prizeType (yang berupa string) menjadi angka sebelum mencari
+    const prizeInfo = cfg.prizes.find(p => p.type === Number(prizeType));
+    
+    // Ambil nama hadiah dari properti 'title'
+    const prizeName = prizeInfo ? prizeInfo.title : prizeType; 
+
+    const winners = luckyData[prizeType];
+
+    if (winners && winners.length > 0) {
+      winners.forEach(winnerObject => {
+        // Ambil MSISDN (logika ini bisa menangani format data Objek maupun Array)
+        const msisdn = winnerObject.msisdn || winnerObject[0];
+        if (msisdn) {
+           outData.push([msisdn, prizeName]);
+        }
+      });
+    }
+  }
 
   writeXML(outData, "/Hasil Undian.xlsx")
     .then(dt => {
